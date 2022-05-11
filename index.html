@@ -1,0 +1,52 @@
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>ESP</title>
+</head>
+<body>
+<textarea name="add" id="add" cols="30" rows="30"></textarea>
+<button onclick="parser()">Check code!</button>
+<script src="esprima.js"></script>
+<script type="text/javascript">
+// var syntax = esprima.parse('var answer = 42');
+function parser() {
+    let a = esprima.tokenize(document.getElementById('add').value);
+    securityCheck(a);
+    // console.log(JSON.stringify(esprima.parse(document.getElementById('add').value), null, 4))
+    // console.log(JSON.stringify(esprima.parse('var answer = 42'), null, 4));
+}
+let b = [];
+function getFunctions(a) {
+    for (let i = 0; i < a.length; i++) {
+        if (a[i].type === 'Keyword' && a[i].value === 'function') {
+        }
+    }
+}
+function securityCheck(a) {
+    for (let i = 0; i < a.length; i++) {
+        if (a[i].value === 'eval') {
+            alert('You using eval(), it may cause a XSS-attack');
+        } else if (a[i].value === 'innerHTML') {
+            alert('You using innerHTML(), it may cause a XSS-attack');
+        }
+        if (a[i].type === 'Identifier' && a[i].value === 'createCipheriv')
+        {
+            if (a[i + 2].value === '"DES"' || a[i + 2].value === '"DES-EDE"' || a[i + 2].value === '"DES-EDE3"')
+            {
+                alert('Noncompliant: DES / 3DES is unsecure');
+            } else if (a[i + 2].value === '"RC2"') {
+                alert('Noncompliant: RC2 is vulnerable to a related-key attack');
+            } else if (a[i + 2].value === '"RC4"') {
+                alert('Noncompliant: RC4 is vulnerable to several attacks');
+            } else if (a[i+2].value === '"BF"') {
+                alert('Noncompliant: Blowfish use a 64-bit block size makes it vulnerable to birthday attacks');
+            }
+        }
+    }
+}
+// vulnerability https://rules.sonarsource.com/javascript/RSPEC-5547
+// AST https://en.wikipedia.org/wiki/Abstract_syntax_tree
+</script>
+
+</body>
+</html>
